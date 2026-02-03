@@ -1,4 +1,4 @@
-name: Telegram Reminder Bot
+name: Telegram Remainder Bot
 
 on:
   schedule:
