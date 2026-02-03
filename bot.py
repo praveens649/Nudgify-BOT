@@ -5,36 +5,12 @@ from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
 from telegram.ext import MessageHandler, Filters
-from flask import Flask
-from threading import Thread
-
-
-
-app = Flask(__name__)
-
-@app.route('/')
-def home():
-    return "🤖 Nudgify Bot is running!"
-
-@app.route('/health')
-def health():
-    return "OK", 200
-
-def run_flask():
-    port = int(os.environ.get('PORT', 10000))
-    app.run(host='0.0.0.0', port=port)
-
-def keep_alive():
-    server = Thread(target=run_flask)
-    server.daemon = True
-    server.start()
-# ===== END FLASK KEEP-ALIVE =====
 
 load_dotenv()
-TOKEN = os.getenv("TELEGRAM_TOKEN") or os.getenv("BOT_TOKEN")
+TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 if not TOKEN:
-    raise ValueError("TELEGRAM_TOKEN or BOT_TOKEN not found in environment variables")
+    raise ValueError("TELEGRAM_TOKEN not found in .env file")
 
 DATA_FILE = "assignments.json"
 
@@ -147,9 +123,6 @@ def help_cmd(update: Update, context: CallbackContext):
     )
 
 def main():
-    # Start Flask server to keep Render awake
-    keep_alive()
-    
     updater = Updater(TOKEN, use_context=True)
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
@@ -158,7 +131,7 @@ def main():
     dp.add_handler(CommandHandler("delete", delete))
     dp.add_handler(CommandHandler("help", help_cmd))
     dp.add_handler(MessageHandler(Filters.command, unknown))
-    print("🤖 Nudgify Bot is running...")
+    print("Bot running...")
     updater.start_polling()
     updater.idle()
 
