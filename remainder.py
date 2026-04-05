@@ -44,7 +44,7 @@ for task in data:
             
             bot.send_message(
                 chat_id=task["user_id"],
-                text=f"hey {name} 🌸\njust a little reminder that your {task['subject']} assignment is due tomorrow\ndo it calmly, no stress. i'm rooting for you 💪"
+                text=f"hey {name} 🌸\njust a little reminder that your Final assignment {task['subject']}  is due tomorrow\ndo it calmly, no stress. i'm rooting for you 💪"
             )
             task["reminded"] = True
             updated = True
