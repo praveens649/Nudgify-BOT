@@ -32,12 +32,13 @@ updated = False
 
 for task in data:
     try:
-        due = datetime.strptime(task["due_date"], "%Y-%m-%d").date()
+        due = datetime.strptime(task["asgn_due_date"], "%Y-%m-%d").date()
+        prg_due = datetime.strptime(task["prg_due_date"], "%Y-%m-%d").date()
     except ValueError:
         print(f"Skipping invalid date format: {task}")
         continue
 
-    if due == tomorrow and not task.get("reminded", False):
+    if due == tomorrow and not task.get("asgn_reminded", False):
         try:
             chat = bot.get_chat(chat_id=task["user_id"])
             name = chat.first_name or "friend"
@@ -46,14 +47,28 @@ for task in data:
                 chat_id=task["user_id"],
                 text=f"hey {name} 🌸\njust a little reminder that your Final assignment {task['subject']}  is due tomorrow\ndo it calmly, no stress. i'm rooting for you 💪"
             )
-            task["reminded"] = True
+            task["asgn_reminded"] = True
             updated = True
             print(f"Reminder sent to {name} ({task['user_id']}) for {task['subject']}")
+        except Exception as e:
+            print(f"Failed to send message: {e}")
+    if prg_due == tomorrow and not task.get("prg_reminded", False):
+        try:
+            chat = bot.get_chat(chat_id=task["user_id"])
+            name = chat.first_name or "friend"
+            
+            bot.send_message(
+                chat_id=task["user_id"],
+                text=f"hey {name} baby just a little reminder to check if the Google apprentice program is open yet don’t miss it this time 😘 bye babe 😘😘"
+            )
+            task["prg_reminded"] = True
+            updated = True
+            print(f"Reminder sent to {name} ({task['user_id']}) for {task['program']}")
         except Exception as e:
             print(f"Failed to send message: {e}")
 
 if updated:
     save_data(data)
-    print("Assignments file updated.")
+    print("files updated.")
 else:
     print("No reminders to send today.")
