@@ -37,7 +37,7 @@ def start(update: Update, context: CallbackContext):
     update.message.reply_text(
         f"Welcome {name}! 👋\n\n"
         "Commands:\n"
-        "/add SUBJECT YYYY-MM-DD\n"
+        "/add SUBJECT ASGN_DUE_DATE PROGRAM PRG_DUE_DATE\n"
         "/list - Show your tasks\n"
         "/delete SUBJECT - Delete a task\n"
         "/help - Show this help message"
@@ -47,37 +47,60 @@ def start(update: Update, context: CallbackContext):
 def add(update: Update, context: CallbackContext):
     user_id = update.message.chat_id
 
-    if len(context.args) != 2:
-        update.message.reply_text("(Sample)Usage ==> /add <remainder_task_name> YYYY-MM-DD")
+    if len(context.args) != 4:
+        update.message.reply_text(
+            "Usage: /add SUBJECT ASGN_DUE_DATE PROGRAM PRG_DUE_DATE\n"
+            "Example: /add blockchain 2026-04-15 application 2026-05-01"
+        )
         return
 
-    subject, due_date = context.args
+    subject, asgn_due_date, program, prg_due_date = context.args
 
-    # Validate date
+    # Validate assignment due date
     try:
-        datetime.strptime(due_date, "%Y-%m-%d")
+        datetime.strptime(asgn_due_date, "%Y-%m-%d")
     except ValueError:
-        update.message.reply_text("Date must be in YYYY-MM-DD format.")
+        update.message.reply_text("ASGN_DUE_DATE must be in YYYY-MM-DD format.")
+        return
+
+    # Validate program due date
+    try:
+        datetime.strptime(prg_due_date, "%Y-%m-%d")
+    except ValueError:
+        update.message.reply_text("PRG_DUE_DATE must be in YYYY-MM-DD format.")
         return
 
     data = load_data()
 
     # Prevent duplicates
     for task in data:
-        if task["user_id"] == user_id and task["subject"] == subject:
+        if (
+            task.get("user_id") == user_id
+            and task.get("subject") == subject
+            and task.get("asgn_due_date") == asgn_due_date
+            and task.get("program") == program
+            and task.get("prg_due_date") == prg_due_date
+        ):
             update.message.reply_text("Task already exists.")
             return
 
     data.append({
         "user_id": user_id,
         "subject": subject,
-        "due_date": due_date,
-        "reminded": False
+        "asgn_due_date": asgn_due_date,
+        "asgn_reminded": False,
+        "program": program,
+        "prg_due_date": prg_due_date,
+        "prg_reminded": False
     })
 
     save_data(data)
     name = update.message.from_user.first_name
-    update.message.reply_text(f"Got it {name}! ✅ Added {subject} due on {due_date}")
+    update.message.reply_text(
+        f"Got it {name}! ✅ Added {subject}\n"
+        f"Assignment due: {asgn_due_date}\n"
+        f"Program: {program} (due: {prg_due_date})"
+    )
 
 def delete(update: Update, context: CallbackContext):
     user_id = update.message.chat_id
@@ -110,14 +133,26 @@ def list_tasks(update: Update, context: CallbackContext):
         update.message.reply_text(f"No tasks found for you, {name}.")
         return
 
-    msg = f"📋 {name}'s Tasks:\n\n" + "\n".join([f"• {t['subject']} → {t['due_date']}" for t in tasks])
+    lines = []
+    for t in tasks:
+        subject = t.get("subject", "(no subject)")
+        asgn_due = t.get("asgn_due_date", t.get("due_date", "N/A"))
+        program = t.get("program", "N/A")
+        prg_due = t.get("prg_due_date", "N/A")
+        lines.append(
+            f"• {subject}\n"
+            f"  Assignment due: {asgn_due}\n"
+            f"  Program: {program} (due: {prg_due})"
+        )
+
+    msg = f"📋 {name}'s Tasks:\n\n" + "\n\n".join(lines)
     update.message.reply_text(msg)
 def help_cmd(update: Update, context: CallbackContext):
     name = update.message.from_user.first_name
     update.message.reply_text(
         f"Here you go {name}! 📖\n\n"
         "Commands:\n"
-        "/add SUBJECT YYYY-MM-DD - Add a task\n"
+        "/add SUBJECT ASGN_DUE_DATE PROGRAM PRG_DUE_DATE - Add a task\n"
         "/list - Show your tasks\n"
         "/delete SUBJECT - Remove a task"
     )

@@ -6,7 +6,7 @@
     "asgn_reminded": false,
     "program":"application",
     "prg_due_date": "2026-05-01",
-    "prg_reminded":"false"
+    "prg_reminded":false
   },
   {
     "user_id": 1309855780,
@@ -15,7 +15,7 @@
     "asgn_reminded": false,
     "program":"application",
     "prg_due_date": "2026-05-01",
-    "prg_reminded":"false"
+    "prg_reminded":false
     
   },
   {
@@ -25,7 +25,7 @@
     "asgn_reminded": false,
     "program":"application",
     "prg_due_date": "2026-05-01",
-    "prg_reminded":"false"
+    "prg_reminded":false
     
   }
 
