@@ -1,0 +1,3 @@
+C:\Users\Praveen\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin
+C:\Users\Praveen\AppData\Local\Google\Cloud SDK\google-cloud-sdk
+& "C:\Users\Praveen\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin\gcloud.cmd" --version
